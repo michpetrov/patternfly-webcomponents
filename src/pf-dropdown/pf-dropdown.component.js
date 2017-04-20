@@ -1,3 +1,6 @@
+import {default as buttonTemplate} from 'pf-dropdown.button.template';
+import {default as kebabTemplate} from 'pf-dropdown.kebab.template';
+
 /**
  * <b>&lt;pf-dropdown&gt;</b> element for Patternfly Web Components
  *
@@ -26,10 +29,28 @@ export class PfDropdown extends HTMLElement {
    * Called when an instance was inserted into the document
    */
   attachedCallback() {
+    this._type = this.attributes.type ? this.attributes.type.value : "button";
+
+    let menu = this.querySelector('.dropdown-menu'),
+      template = document.createElement("template");
+    switch (this._type) {
+      case 'kebab':
+        this.classList.add("dropdown-kebab-pf");
+        template.innerHTML = kebabTemplate;
+        this.insertBefore(template.content, menu);
+        break;
+      case 'button':
+      default:
+        template.innerHTML = buttonTemplate;
+        if (this.attributes.label) {
+          template.content.querySelector(".btn").childNodes[0].textContent = this.attributes.label.value + "\n";
+        }
+        this.insertBefore(template.content, menu);
+    }
 
     this._button = this.querySelector('.btn');
     this._disabled = /\bdisabled/.test(this._button.className);
-    let menu = this.querySelector('.dropdown-menu');
+
 
     this._button.addEventListener('click', () => {
       this._showDropdown();
